@@ -1,14 +1,10 @@
 server.port: 8080
 
-management:
-  tracing:
-    sampling.probability: 1
-    baggage.enabled: true
-    propagation: [B3]
+spring:
+  sleuth:
+    tx.enabled: false
     baggage:
-      correlation:
-        enabled: true
-        fields:
-          - some_field
-      remote-fields:
+      local-fields:
+        - some_field
+      correlation-fields:
         - some_field

@@ -1,6 +1,6 @@
 package com.example.httpclientpropagation30;
 
-import io.micrometer.tracing.Baggage;
+import brave.baggage.BaggageField;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -10,16 +10,18 @@ import reactor.core.publisher.Mono;
 class MyController {
 
     private final WebClient webClient;
-    private final Baggage valueToPropagate;
+    private final BaggageField valueToPropagate;
 
-    MyController(WebClient webClient, Baggage valueToPropagate) {
+    MyController(WebClient webClient, BaggageField valueToPropagate) {
         this.webClient = webClient;
         this.valueToPropagate = valueToPropagate;
     }
 
     @RequestMapping("/first/{value}")
     Mono<String> first(@PathVariable String value) {
-        valueToPropagate.set(value);
+        if (!valueToPropagate.updateValue(value)) {
+            System.out.println("Could not update baggage field value to " + value + ". Previous: " + valueToPropagate.getValue());
+        }
         return webClient.get().uri("http://localhost:8080/remoteSystem").exchangeToMono( this::handleResponse);
     }
 
