@@ -15,14 +15,14 @@ public class MyNettyChannelHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-// -----> here value is null
+// -----> here value is null on Spring Boot 3, but works on 2.7
         System.out.println("read: " + additionalContext.get().toString());
         ctx.fireChannelRead(msg);
     }
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
-// -----> here value is null
+// -----> here value is null on Spring Boot 3, but works on 2.7
         System.out.println("write: " + additionalContext.get().toString());
         ctx.write(msg, promise);
     }
