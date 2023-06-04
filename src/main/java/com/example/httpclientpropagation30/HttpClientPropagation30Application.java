@@ -1,8 +1,9 @@
 package com.example.httpclientpropagation30;
 
+import io.micrometer.context.ContextSnapshot;
 import io.micrometer.tracing.Baggage;
 import io.micrometer.tracing.Tracer;
-import io.netty.channel.Channel;
+import io.netty.channel.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
@@ -52,9 +53,6 @@ class HttpClientPropagation30Configuration {
         return HttpClient.create()
                          .doOnChannelInit(
                                  (ConnectionObserver observer, Channel channel, SocketAddress remoteAddress) -> {
-// -----> works here, but it's only called on first request
-                                     System.out.println("baggage: " + valueToPropagate.makeCurrent().get());
-
                                      var pipeline = channel.pipeline();
                                      if (pipeline.get(NettyPipeline.HttpCodec) != null) {
                                          Supplier<Map<String, String>> additionalContext = () -> createAdditionalContext(
@@ -64,6 +62,7 @@ class HttpClientPropagation30Configuration {
                                          pipeline.addAfter(NettyPipeline.HttpCodec, "MyHandler",
                                                            httpClientLoggingHandler);
                                      }
-                                 });
+                                 })
+                ;
     }
 }
