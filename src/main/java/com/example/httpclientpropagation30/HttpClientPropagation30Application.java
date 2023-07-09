@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 @SpringBootApplication
-class HttpClientPropagation30Application {
+public class HttpClientPropagation30Application {
 
     public static void main(String[] args) {
         Hooks.enableAutomaticContextPropagation();

@@ -19,8 +19,10 @@ class MyController {
 
     @RequestMapping("/first/{value}")
     Mono<String> first(@PathVariable String value) {
-        valueToPropagate.set(value);
-        return webClient.get().uri("http://localhost:8080/remoteSystem").exchangeToMono( this::handleResponse);
+        System.out.println(value);
+        valueToPropagate.makeCurrent(value);
+        System.out.println(valueToPropagate.makeCurrent().get());
+        return webClient.get().uri("http://localhost:8080/remoteSystem/{something}", valueToPropagate.makeCurrent().get()).exchangeToMono( this::handleResponse);
     }
 
     private Mono<String> handleResponse(ClientResponse response) {
@@ -30,8 +32,8 @@ class MyController {
             return Mono.error(new RuntimeException());
     }
 
-    @RequestMapping("/remoteSystem")
-    Mono<String> remoteSystem() {
-        return Mono.just("Some response");
+    @RequestMapping("/remoteSystem/{value}")
+    Mono<String> remoteSystem(@PathVariable String value) {
+        return Mono.just("Remote response: " + value);
     }
 }
